@@ -1,0 +1,17 @@
+#include <SFML/Graphics.hpp>
+
+const int HEIGHT_MAP = 10;
+const int WIDTH_MAP = 10;
+
+sf::String TileMap[HEIGHT_MAP] = {
+	"BBBBBBBBBB",
+	"B01010101B",
+	"B10101010B",
+	"B01010101B",
+	"B10101010B",
+	"B01010101B",
+	"B10101010B",
+	"B01010101B",
+	"B10101010B",
+	"BBBBBBBBBB",
+};
