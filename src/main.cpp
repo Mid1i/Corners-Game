@@ -1,46 +1,68 @@
-#include <SFML/Graphics.hpp>
 #include "map.h"
-#include "GameEngine.h"
-
-using namespace sf;
+#include "Engine.h"
+#include "GrafficInterface.h"
+#include "EngineBot.h"
 
 int main() {
-	RenderWindow window(VideoMode(560, 560), "Game");
+	sf::RenderWindow window(sf::VideoMode(900, 700), "Corners game");
 
-	Image map_image;
-	map_image.loadFromFile("C:/C++/sfml/src/Images/cells.png");
-	Texture map;
-	map.loadFromImage(map_image);
-	Sprite s_map;
-	s_map.setTexture(map);
+	Map map;
 
-	GameEngine eng(window);
+	Engine eng;
+	GrafficInterface gui;
+	EngineBot engbot;
 
 	while (window.isOpen()) {
-		Event event;
+
+		sf::Event event;
+
 		while (window.pollEvent(event)) {
-			if (event.type == Event::Closed)
+
+			if (event.type == sf::Event::Closed)
+			{
 				window.close();
+			}
+
+			if ((event.type == sf::Event::KeyPressed) && !gui.isPaused)
+			{
+				if (event.key.code == sf::Keyboard::Enter)
+				{
+					if (gui.gameStatus == 1) engbot.changeTurn();
+					else eng.changeTurn();
+				}
+
+				if (event.key.code == sf::Keyboard::BackSpace)
+				{
+					if (gui.gameStatus == 1) engbot.cancellMove();
+					else eng.cancellMove();
+				}
+			}
 		}
 
-		window.clear();
+		gui.startGame(window, event, eng, engbot);
 
-		for (int i=0;i<HEIGHT_MAP;i++)
-		for (int j=0;j<WIDTH_MAP;j++)
+		window.clear(sf::Color(255, 165, 47));
+
+		map.draw(window);
+		map.drawLines(window);
+
+		if (gui.gameStatus == 1)
 		{
-			if (TileMap[i][j] == 'B') s_map.setTextureRect(IntRect(0, 57, 0, 0));
-			if (TileMap[i][j] == '0') s_map.setTextureRect(IntRect(0, 0, 56, 56));
-			if (TileMap[i][j] == '1') s_map.setTextureRect(IntRect(56, 0, 56, 56));
-
-			s_map.setPosition(j*56, i*56);
-			window.draw(s_map);
+			engbot.evalFunc();
+			engbot.mouseStep(window, event);
+			engbot.win();
+			engbot.draw(window);
+		}
+		else
+		{
+			eng.mouseStep(window, event);
+			eng.win();
+			eng.draw(window);
 		}
 
-		eng.draw(window);
-		eng.step(window);
+		Sleep(65);
 
-		window.display();
+		//window.display();
 	}
-
 	return 0;
 }
